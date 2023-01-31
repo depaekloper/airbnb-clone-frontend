@@ -22,7 +22,7 @@ import {
   IUsernameLoginError,
   IUsernameLoginSuccess,
   IUsernameLoginVariables,
-  usernameLogin,
+  usernameLogIn,
 } from "../api";
 import SocialLogin from "./SocialLogin";
 
@@ -31,7 +31,7 @@ interface LoginModalProps {
   onClose: () => void;
 }
 
-interface IFrom {
+interface IForm {
   username: string;
   password: string;
 }
@@ -41,29 +41,28 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<IFrom>();
-  const toast = useToast;
+  } = useForm<IForm>();
+  const toast = useToast();
   const queryClient = useQueryClient();
-  const mutation = useMutation(usernameLogin, {
+  const mutation = useMutation(usernameLogIn, {
     onMutate: () => {
-      console.log("starting");
+      console.log("mutation starting");
     },
     onSuccess: (data) => {
       toast({
-        title: "Welcome back!",
+        title: "welcome back!",
         status: "success",
       });
       onClose();
       queryClient.refetchQueries(["me"]);
     },
     onError: (error) => {
-      console.log("error");
+      console.log("mutation has an error");
     },
   });
-  const onSubmit = ({ username, password }: IFrom) => {
+  const onSubmit = ({ username, password }: IForm) => {
     mutation.mutate({ username, password });
   };
-
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
       <ModalOverlay />
