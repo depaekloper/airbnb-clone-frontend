@@ -50,7 +50,7 @@ export const githubLogIn = (code: string) =>
 export const kakaoLogin = (code: string) =>
   instance
     .post(
-      `users/kakao`,
+      `/users/kakao`,
       { code },
       {
         headers: {
