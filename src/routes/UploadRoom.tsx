@@ -17,9 +17,9 @@ import {
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { FaBed, FaMoneyBill, FaToilet } from "react-icons/fa";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { FaBed, FaMoneyBill, FaToilet, FaUsb } from "react-icons/fa";
 import {
   getAmenities,
   getCategories,
@@ -28,33 +28,42 @@ import {
 } from "../api";
 import useHostOnlyPage from "../components/HostOnlyPage";
 import ProtectedPage from "../components/ProtectedPage";
-import { IAmenity, ICategory } from "../types";
+import { IAmenity, ICategory, IRoomDetail } from "../types";
+import { useNavigate } from "react-router-dom";
 
 export default function UploadRoom() {
   const { register, handleSubmit } = useForm<IUploadRoomVariables>();
   const toast = useToast();
+  const navigate = useNavigate();
   const mutation = useMutation(uploadRoom, {
-    onSuccess: () => {
+    onSuccess: (data: IRoomDetail) => {
       toast({
         status: "success",
         title: "Room created",
         position: "bottom-right",
       });
+      navigate(`/rooms/${data.id}`);
     },
   });
-  const { data: amenities, isLoading: isAmenitiesLoading } = useQuery<
-    IAmenity[]
-  >(["amenities"], getAmenities);
-  const { data: categories, isLoading: isCategoriesLoading } = useQuery<
-    ICategory[]
-  >(["categories"], getCategories);
+  const { data: amenities } = useQuery<IAmenity[]>(["amenities"], getAmenities);
+  const { data: categories } = useQuery<ICategory[]>(
+    ["categories"],
+    getCategories
+  );
   useHostOnlyPage();
   const onSubmit = (data: IUploadRoomVariables) => {
     mutation.mutate(data);
   };
   return (
     <ProtectedPage>
-      <Box pb={40} mt={10} px={{ base: 10, lg: 40 }}>
+      <Box
+        pb={40}
+        mt={10}
+        px={{
+          base: 10,
+          lg: 40,
+        }}
+      >
         <Container>
           <Heading textAlign={"center"}>Upload Room</Heading>
           <VStack
@@ -65,20 +74,36 @@ export default function UploadRoom() {
           >
             <FormControl>
               <FormLabel>Name</FormLabel>
-              <Input {...register("name", { required: true })} type="text" />
+              <Input
+                {...register("name", { required: true })}
+                required
+                type="text"
+              />
               <FormHelperText>Write the name of your room.</FormHelperText>
             </FormControl>
             <FormControl>
               <FormLabel>Country</FormLabel>
-              <Input {...register("country", { required: true })} type="text" />
+              <Input
+                {...register("country", { required: true })}
+                required
+                type="text"
+              />
             </FormControl>
             <FormControl>
               <FormLabel>City</FormLabel>
-              <Input {...register("city", { required: true })} type="text" />
+              <Input
+                {...register("city", { required: true })}
+                required
+                type="text"
+              />
             </FormControl>
             <FormControl>
               <FormLabel>Address</FormLabel>
-              <Input {...register("address", { required: true })} type="text" />
+              <Input
+                {...register("address", { required: true })}
+                required
+                type="text"
+              />
             </FormControl>
             <FormControl>
               <FormLabel>Price</FormLabel>
@@ -87,7 +112,7 @@ export default function UploadRoom() {
                 <Input
                   {...register("price", { required: true })}
                   type="number"
-                  min={5}
+                  min={0}
                 />
               </InputGroup>
             </FormControl>
@@ -98,7 +123,7 @@ export default function UploadRoom() {
                 <Input
                   {...register("rooms", { required: true })}
                   type="number"
-                  min={5}
+                  min={0}
                 />
               </InputGroup>
             </FormControl>
@@ -109,7 +134,7 @@ export default function UploadRoom() {
                 <Input
                   {...register("toilets", { required: true })}
                   type="number"
-                  min={5}
+                  min={0}
                 />
               </InputGroup>
             </FormControl>
@@ -119,13 +144,13 @@ export default function UploadRoom() {
             </FormControl>
             <FormControl>
               <Checkbox {...register("pet_friendly", { required: true })}>
-                Pet freindly?
+                Pet friendly?
               </Checkbox>
             </FormControl>
             <FormControl>
               <FormLabel>Kind of room</FormLabel>
               <Select
-                {...register("category", { required: true })}
+                {...register("kind", { required: true })}
                 placeholder="Choose a kind"
               >
                 <option value="entire_place">Entire Place</option>
@@ -138,7 +163,10 @@ export default function UploadRoom() {
             </FormControl>
             <FormControl>
               <FormLabel>Category</FormLabel>
-              <Select placeholder="Choose a kind">
+              <Select
+                {...register("category", { required: true })}
+                placeholder="Choose a category"
+              >
                 {categories?.map((category) => (
                   <option key={category.pk} value={category.pk}>
                     {category.name}
@@ -173,7 +201,7 @@ export default function UploadRoom() {
               isLoading={mutation.isLoading}
               colorScheme={"red"}
               size="lg"
-              w={"100%"}
+              w="100%"
             >
               Upload Room
             </Button>

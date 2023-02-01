@@ -110,7 +110,7 @@ export interface IUploadRoomVariables {
 
 export const uploadRoom = (variables: IUploadRoomVariables) =>
   instance
-    .post(`/rooms`, variables, {
+    .post(`rooms/`, variables, {
       headers: {
         "X-CSRFToken": Cookie.get("csrftoken") || "",
       },
